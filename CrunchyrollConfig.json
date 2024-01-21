@@ -1,0 +1,32 @@
+{
+	"name": "Crunchyroll",
+	"description": "Crunchyroll plugin",
+	"author": "DeltaEvo",
+	"authorUrl": "https://github.com/DeltaEvo",
+	
+	"sourceUrl": "https://DeltaEvo.github.io/GrayjayCrunchyroll/CrunchyrollConfig.json",
+	"repositoryUrl": "https://github.com/DeltaEvo/GrayjayCrunchyroll",
+	"scriptUrl": "./CrunchyrollScript.js",
+	"version": 1,
+	
+	"iconUrl": "./crunchyroll.png",
+	"id": "3af73d7b-05bc-4a1b-a142-8a8377fc9c5b",
+	
+	"scriptSignature": "",
+	"scriptPublicKey": "",
+	"packages": ["Http"],
+	
+	"allowEval": false,
+	"allowUrls": [
+		"www.crunchyroll.com",
+		"cr-play-service.prd.crunchyrollsvc.com",
+		"v.vrv.co"
+	],
+
+	"authentication": {
+		"userAgent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.5481.153 Mobile Safari/537.36",
+		"loginUrl": "https://sso.crunchyroll.com/login",
+		"cookiesToFind": ["etp_rt"],
+		"cookiesExclOthers": true
+	}
+}
