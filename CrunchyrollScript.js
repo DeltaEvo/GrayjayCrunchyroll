@@ -238,6 +238,30 @@ Object.assign(source, {
       })),
     });
   },
+
+  getContentChapters(url) {
+    if (!source.isContentDetailsUrl(url)) throw new Error("Invalid url");
+
+    const suburl = url.slice("https://www.crunchyroll.com/watch/".length);
+
+    const [id, slug] = suburl.split("/");
+
+    const resp = http.GET(
+      `https://static.crunchyroll.com/skip-events/production/${id}.json`,
+      {}
+    );
+
+    const skip_events = JSON.parse(resp.body);
+
+    return Object.values(skip_events)
+      .filter((v) => typeof v === "object")
+      .map(({ start, end, type }) => ({
+        name: type,
+        timeStart: start,
+        timeEnd: end,
+        type: Type.Chapter.SKIPPABLE,
+      }));
+  },
 });
 
 function* parseASS(ass) {

@@ -19,6 +19,7 @@
 	"allowEval": false,
 	"allowUrls": [
 		"www.crunchyroll.com",
+		"static.crunchyroll.com",
 		"cr-play-service.prd.crunchyrollsvc.com",
 		"v.vrv.co"
 	],
