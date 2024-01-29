@@ -127,7 +127,7 @@ class BrowsePager extends VideoPager {
 
 class SeasonPager extends VideoPager {
   constructor(context, results) {
-    const isLastSeason = context.season + 1 == context.seasons.length;
+    const isLastSeason = context.season === 0;
     super(results, !isLastSeason, context);
   }
 
@@ -135,7 +135,7 @@ class SeasonPager extends VideoPager {
     return SeasonPager.season(
       this.context.access_token,
       this.context.serie,
-      this.context.season + 1,
+      this.context.season - 1,
       this.context.seasons
     );
   }
@@ -154,16 +154,18 @@ class SeasonPager extends VideoPager {
 
     console.log(data);
 
-    const results = data.map(
-      (episode) =>
-        new PlatformVideo(
-          crunchyrollEpisodeToPlatformVideoDef(
-            { ...episode, episode_metadata: episode },
-            serie,
-            `S${season + 1} E${episode.episode}: `
+    const results = data
+      .toReversed()
+      .map(
+        (episode) =>
+          new PlatformVideo(
+            crunchyrollEpisodeToPlatformVideoDef(
+              { ...episode, episode_metadata: episode },
+              serie,
+              `S${season + 1} E${episode.episode}: `
+            )
           )
-        )
-    );
+      );
 
     return new SeasonPager({ access_token, serie, season, seasons }, results);
   }
@@ -333,6 +335,13 @@ Object.assign(source, {
     });
   },
 
+  getChannelCapabilities() {
+    return {
+      types: [Type.Feed.Videos],
+      sorts: [Type.Order.Chronological],
+    };
+  },
+
   getChannelContents(url) {
     if (!source.isChannelUrl(url)) throw new Error("Invalid url");
 
@@ -354,7 +363,7 @@ Object.assign(source, {
     return SeasonPager.season(
       this.access_token,
       serie,
-      0,
+      data.length - 1,
       data.map(({ id }) => id)
     );
   },
