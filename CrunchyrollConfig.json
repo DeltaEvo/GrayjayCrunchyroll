@@ -3,19 +3,19 @@
 	"description": "Crunchyroll plugin",
 	"author": "DeltaEvo",
 	"authorUrl": "https://github.com/DeltaEvo",
-	
+
 	"sourceUrl": "https://DeltaEvo.github.io/GrayjayCrunchyroll/CrunchyrollConfig.json",
 	"repositoryUrl": "https://github.com/DeltaEvo/GrayjayCrunchyroll",
 	"scriptUrl": "./CrunchyrollScript.js",
 	"version": 1,
-	
+
 	"iconUrl": "./crunchyroll.png",
 	"id": "3af73d7b-05bc-4a1b-a142-8a8377fc9c5b",
-	
+
 	"scriptSignature": "",
 	"scriptPublicKey": "",
 	"packages": ["Http"],
-	
+
 	"allowEval": false,
 	"allowUrls": [
 		"www.crunchyroll.com",
