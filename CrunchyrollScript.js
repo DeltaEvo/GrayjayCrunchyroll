@@ -39,10 +39,10 @@ function queryString(o) {
     .join("&");
 }
 
-function crunchyrollEpisodeToPlatformVideoDef(episode, serie) {
+function crunchyrollEpisodeToPlatformVideoDef(episode, serie, prefix = "") {
   return {
     id: new PlatformID(PLATFORM, episode.id, PLUGIN_ID),
-    name: episode.title,
+    name: prefix + episode.title,
     thumbnails: new Thumbnails(
       episode.images.thumbnail[0].map(
         ({ source, height }) => new Thumbnail(source, height)
@@ -122,6 +122,50 @@ class BrowsePager extends VideoPager {
       { access_token, next_offset: offset + data.length },
       results
     );
+  }
+}
+
+class SeasonPager extends VideoPager {
+  constructor(context, results) {
+    const isLastSeason = context.season + 1 == context.seasons.length;
+    super(results, !isLastSeason, context);
+  }
+
+  nextPage() {
+    return SeasonPager.season(
+      this.context.access_token,
+      this.context.serie,
+      this.context.season + 1,
+      this.context.seasons
+    );
+  }
+
+  static season(access_token, serie, season, seasons) {
+    const id = seasons[season];
+
+    const resp = http.GET(
+      `https://www.crunchyroll.com/content/v2/cms/seasons/${id}/episodes?preferred_audio_language=fr-FR&locale=en-US`,
+      {
+        Authorization: `Bearer ${access_token}`,
+      }
+    );
+
+    const { data } = JSON.parse(resp.body);
+
+    console.log(data);
+
+    const results = data.map(
+      (episode) =>
+        new PlatformVideo(
+          crunchyrollEpisodeToPlatformVideoDef(
+            { ...episode, episode_metadata: episode },
+            serie,
+            `S${season + 1} E${episode.episode}: `
+          )
+        )
+    );
+
+    return new SeasonPager({ access_token, serie, season, seasons }, results);
   }
 }
 
@@ -261,6 +305,58 @@ Object.assign(source, {
         timeEnd: end,
         type: Type.Chapter.SKIPPABLE,
       }));
+  },
+
+  isChannelUrl(url) {
+    return url.startsWith("https://www.crunchyroll.com/series/");
+  },
+
+  getChannel(url) {
+    if (!source.isChannelUrl(url)) throw new Error("Invalid url");
+
+    const suburl = url.slice("https://www.crunchyroll.com/series/".length);
+
+    const [id, slug] = suburl.split("/");
+
+    const [serie] = fetchObjects(this.access_token, [id]);
+
+    console.log(serie);
+
+    return new PlatformChannel({
+      id: new PlatformID(PLATFORM, id, PLUGIN_ID),
+      name: serie.title,
+      thumbnail: serie.images.poster_tall[0][0].source,
+      banner: serie.images.poster_wide[0].slice(-1)[0].source,
+      subscribers: -1,
+      description: serie.description,
+      url,
+    });
+  },
+
+  getChannelContents(url) {
+    if (!source.isChannelUrl(url)) throw new Error("Invalid url");
+
+    const suburl = url.slice("https://www.crunchyroll.com/series/".length);
+
+    const [id, slug] = suburl.split("/");
+
+    const [serie] = fetchObjects(this.access_token, [id]);
+
+    const resp = http.GET(
+      `https://www.crunchyroll.com/content/v2/cms/series/${id}/seasons?preferred_audio_language=fr-FR&locale=en-US`,
+      {
+        Authorization: `Bearer ${this.access_token}`,
+      }
+    );
+
+    const { data } = JSON.parse(resp.body);
+
+    return SeasonPager.season(
+      this.access_token,
+      serie,
+      0,
+      data.map(({ id }) => id)
+    );
   },
 });
 
