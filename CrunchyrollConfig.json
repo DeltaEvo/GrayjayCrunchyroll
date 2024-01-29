@@ -7,7 +7,7 @@
 	"sourceUrl": "https://DeltaEvo.github.io/GrayjayCrunchyroll/CrunchyrollConfig.json",
 	"repositoryUrl": "https://github.com/DeltaEvo/GrayjayCrunchyroll",
 	"scriptUrl": "./CrunchyrollScript.js",
-	"version": 2,
+	"version": 3,
 
 	"iconUrl": "./crunchyroll.png",
 	"id": "3af73d7b-05bc-4a1b-a142-8a8377fc9c5b",
