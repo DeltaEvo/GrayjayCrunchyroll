@@ -6,7 +6,7 @@
 	"sourceUrl": "https://raw.githubusercontent.com/mzramna/GrayjayCrunchyroll/main/CrunchyrollConfig.json",
 	"repositoryUrl": "https://github.com/mzramna/GrayjayCrunchyroll",
 	"scriptUrl": "./CrunchyrollScript.js",
-	"version": 14,
+	"version": 15,
 	"iconUrl": "./crunchyroll.png",
 	"id": "3af73d7b-05bc-4a1b-a142-8a8377fc9c5b",
 	"scriptSignature": "",
@@ -45,6 +45,9 @@
 		"14": [
 			"Seleciona o perfil da conta ao obter o token logado",
 			"Mensagens de erro claras ao reproduzir sem login"
+		],
+		"15": [
+			"Login, token e reprodução idênticos ao plugin original; mantém apenas busca/filtros/idiomas"
 		]
 	},
 	"settings": [
@@ -111,21 +114,6 @@
 			"description": "Na busca de canais (séries), mostrar apenas séries com legenda no idioma padrão",
 			"type": "Boolean",
 			"default": "false"
-		},
-		{
-			"variable": "profileIndex",
-			"name": "Perfil da conta",
-			"description": "Perfil da Crunchyroll usado para reproduzir (1 = primeiro perfil)",
-			"type": "Dropdown",
-			"default": "0",
-			"options": [
-				"1",
-				"2",
-				"3",
-				"4",
-				"5",
-				"6"
-			]
 		}
 	]
 }

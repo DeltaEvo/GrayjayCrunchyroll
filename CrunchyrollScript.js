@@ -24,6 +24,7 @@ function firstImage(arr) {
   return set && set.length ? set[0].source : null;
 }
 
+
 function fetchAccessToken({ grant_type, useAuth = false, headers = {} }) {
   const AUTHORIZATIONS = {
     client_id: "Basic Y3Jfd2ViOg==",
@@ -40,64 +41,9 @@ function fetchAccessToken({ grant_type, useAuth = false, headers = {} }) {
     useAuth
   );
 
-  if (!resp.isOk) {
-    if (useAuth)
-      throw new ScriptLoginRequiredException(
-        `Crunchyroll recusou o login (${resp.code}). Faça login novamente e selecione o perfil.`
-      );
-    throw new ScriptException(`Crunchyroll recusou o token (${resp.code}).`);
-  }
-  const token = JSON.parse(resp.body);
+  const { access_token } = JSON.parse(resp.body);
 
-  if (useAuth && !token.profile_id && token.refresh_token) {
-    try {
-      return selectProfile(token);
-    } catch (e) {
-      log("Crunchyroll: falha ao selecionar perfil: " + e);
-    }
-  }
-
-  return token.access_token;
-}
-
-// Accounts with multiple profiles need a profile-bound token to play videos
-function selectProfile(token) {
-  const resp = http.GET("https://www.crunchyroll.com/accounts/v1/me/multiprofile", {
-    Authorization: `Bearer ${token.access_token}`,
-  });
-  if (!resp.isOk) return token.access_token;
-  const profiles = JSON.parse(resp.body).profiles || [];
-  if (!profiles.length) return token.access_token;
-  const idx = parseInt(settings && settings.profileIndex, 10) || 0;
-  const profile = profiles[idx] || profiles.find((p) => p.is_primary) || profiles[0];
-  const r = http.POST(
-    "https://www.crunchyroll.com/auth/v1/token",
-    `grant_type=refresh_token_profile_id&profile_id=${profile.profile_id}&refresh_token=${encodeURIComponent(token.refresh_token)}`,
-    {
-      Authorization: "Basic bm9haWhkZXZtXzZpeWcwYThsMHE6",
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    false
-  );
-  if (!r.isOk) return token.access_token;
-  return JSON.parse(r.body).access_token || token.access_token;
-}
-
-let cachedToken = null;
-let cachedTokenLoggedIn = null;
-function getToken() {
-  const loggedIn = bridge.isLoggedIn();
-  if (!cachedToken || cachedTokenLoggedIn !== loggedIn) {
-    cachedToken = loggedIn
-      ? fetchAccessToken({
-          grant_type: "etp_rt_cookie",
-          headers: { "ETP-Anonymous-ID": "89142ecb-e25d-4799-b96e-b23c09a71a6b" },
-          useAuth: true,
-        })
-      : fetchAccessToken({ grant_type: "client_id" });
-    cachedTokenLoggedIn = loggedIn;
-  }
-  return cachedToken;
+  return access_token;
 }
 
 function fetchObjects(access_token, ids) {
@@ -108,18 +54,7 @@ function fetchObjects(access_token, ids) {
     }
   );
 
-  let body = null;
-  try {
-    body = JSON.parse(resp.body);
-  } catch (e) {}
-  if (!resp.isOk || !body || !Array.isArray(body.data)) {
-    if (resp.code === 401 || resp.code === 403)
-      throw new ScriptLoginRequiredException(
-        `Crunchyroll recusou o acesso (${resp.code}). Faça login, selecione o perfil e tente novamente.`
-      );
-    throw new ScriptException(`Crunchyroll: resposta inesperada (${resp.code}) ao buscar ${ids.join(",")}`);
-  }
-  return body.data;
+  return JSON.parse(resp.body).data;
 }
 
 function queryString(o) {
@@ -133,7 +68,7 @@ function crunchyrollEpisodeToPlatformVideoDef(episode, serie, prefix = "") {
     id: new PlatformID(PLATFORM, episode.id, PLUGIN_ID),
     name: prefix + episode.title,
     thumbnails: new Thumbnails(
-      ((episode.images && episode.images.thumbnail && episode.images.thumbnail[0]) || []).map(
+      episode.images.thumbnail[0].map(
         ({ source, height }) => new Thumbnail(source, height)
       )
     ),
@@ -141,7 +76,7 @@ function crunchyrollEpisodeToPlatformVideoDef(episode, serie, prefix = "") {
       new PlatformID(PLATFORM, episode.episode_metadata.series_id, PLUGIN_ID),
       episode.episode_metadata.series_title,
       `https://www.crunchyroll.com/series/${episode.episode_metadata.series_id}`,
-      firstImage(serie && serie.images && serie.images.poster_tall),
+      serie?.images.poster_tall[0][0].source,
       null
     ),
     uploadDate: Date.parse(episode.episode_metadata.upload_date) / 1000,
@@ -244,8 +179,7 @@ class SeasonPager extends VideoPager {
     console.log(data);
 
     const results = data
-      .slice()
-      .reverse()
+      .toReversed()
       .map(
         (episode) =>
           new PlatformVideo(
@@ -375,13 +309,12 @@ function extract_stream_id(stream_url) {
 Object.assign(source, {
   enable(conf, userSettings) {
     settings = userSettings || {};
-    // Token is fetched lazily: an error here would leave the plugin disabled
-    // (and the login button would not open the Crunchyroll page).
+    this.access_token = fetchAccessToken({ grant_type: "client_id" });
   },
 
   searchSuggestions(query) {
     try {
-      return crunchySearch(getToken(), query, "series", 0, 6).items.map((s) => s.title);
+      return crunchySearch(this.access_token, query, "series", 0, 6).items.map((s) => s.title);
     } catch (e) {
       return [];
     }
@@ -420,15 +353,15 @@ Object.assign(source, {
   },
 
   search(query, type, order, filters) {
-    return SearchPager.search(getToken(), query, resolveFilters(filters), 0);
+    return SearchPager.search(this.access_token, query, resolveFilters(filters), 0);
   },
 
   searchChannels(query) {
-    return SeriesSearchPager.search(getToken(), query, 0);
+    return SeriesSearchPager.search(this.access_token, query, 0);
   },
 
   getHome() {
-    return BrowsePager.browse(getToken());
+    return BrowsePager.browse(this.access_token);
   },
 
   isContentDetailsUrl(url) {
@@ -560,7 +493,7 @@ Object.assign(source, {
 
     const [id, slug] = suburl.split("/");
 
-    const [serie] = fetchObjects(getToken(), [id]);
+    const [serie] = fetchObjects(this.access_token, [id]);
 
     console.log(serie);
 
@@ -589,19 +522,19 @@ Object.assign(source, {
 
     const [id, slug] = suburl.split("/");
 
-    const [serie] = fetchObjects(getToken(), [id]);
+    const [serie] = fetchObjects(this.access_token, [id]);
 
     const resp = http.GET(
       `https://www.crunchyroll.com/content/v2/cms/series/${id}/seasons?preferred_audio_language=${getAudio()}&locale=${getLocale()}`,
       {
-        Authorization: `Bearer ${getToken()}`,
+        Authorization: `Bearer ${this.access_token}`,
       }
     );
 
     const { data } = JSON.parse(resp.body);
 
     return SeasonPager.season(
-      getToken(),
+      this.access_token,
       serie,
       data.length - 1,
       data.map(({ id }) => id)
