@@ -6,7 +6,7 @@
 	"sourceUrl": "https://raw.githubusercontent.com/mzramna/GrayjayCrunchyroll/main/CrunchyrollConfig.json",
 	"repositoryUrl": "https://github.com/mzramna/GrayjayCrunchyroll",
 	"scriptUrl": "./CrunchyrollScript.js",
-	"version": 4,
+	"version": 5,
 	"iconUrl": "./crunchyroll.png",
 	"id": "3af73d7b-05bc-4a1b-a142-8a8377fc9c5b",
 	"scriptSignature": "",
@@ -32,6 +32,10 @@
 			"Compatibilidade com Grayjay Desktop",
 			"Busca com filtros de idioma de áudio (dublagem) e legenda",
 			"Configurações de idioma (pt-BR incluído)"
+		],
+		"5": [
+			"Corrige falha na instalação (403 no token)",
+			"Usa a sessão logada para obter o token"
 		]
 	},
 	"settings": [
