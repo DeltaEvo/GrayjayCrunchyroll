@@ -3,7 +3,7 @@
 	"description": "Crunchyroll plugin",
 	"author": "DeltaEvo",
 	"authorUrl": "https://github.com/DeltaEvo",
-	"sourceUrl": "https://mzramna.github.io/GrayjayCrunchyroll/CrunchyrollConfig.json",
+	"sourceUrl": "https://raw.githubusercontent.com/mzramna/GrayjayCrunchyroll/main/CrunchyrollConfig.json",
 	"repositoryUrl": "https://github.com/mzramna/GrayjayCrunchyroll",
 	"scriptUrl": "./CrunchyrollScript.js",
 	"version": 4,
