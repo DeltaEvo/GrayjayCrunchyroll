@@ -6,7 +6,7 @@
 	"sourceUrl": "https://raw.githubusercontent.com/mzramna/GrayjayCrunchyroll/main/CrunchyrollConfig.json",
 	"repositoryUrl": "https://github.com/mzramna/GrayjayCrunchyroll",
 	"scriptUrl": "./CrunchyrollScript.js",
-	"version": 5,
+	"version": 6,
 	"iconUrl": "./crunchyroll.png",
 	"id": "3af73d7b-05bc-4a1b-a142-8a8377fc9c5b",
 	"scriptSignature": "",
@@ -19,8 +19,7 @@
 		"everywhere"
 	],
 	"authentication": {
-		"loginUrl": "https://www.crunchyroll.com/login",
-		"completionUrl": "https://www.crunchyroll.com/",
+		"loginUrl": "https://sso.crunchyroll.com/login?return_url=https%3A%2F%2Fwww.crunchyroll.com%2F",
 		"cookiesToFind": [
 			"etp_rt"
 		],
@@ -36,6 +35,9 @@
 		"5": [
 			"Corrige falha na instalação (403 no token)",
 			"Usa a sessão logada para obter o token"
+		],
+		"6": [
+			"Corrige detecção de login no Desktop"
 		]
 	},
 	"settings": [
