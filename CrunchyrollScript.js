@@ -32,6 +32,12 @@ function langSetting(name, fallback) {
 const getLocale = () => langSetting("locale", "pt-BR");
 const getAudio = () => langSetting("audioLanguage", "ja-JP");
 
+// Cloudflare challenge: let the user solve it in Grayjay's captcha window
+function checkCaptcha(resp, url) {
+  if ((resp.code === 403 || resp.code === 503) && /Just a moment|cf-chl|challenge-platform/i.test(resp.body || ""))
+    throw new CaptchaRequiredException(url, resp.body);
+}
+
 function fetchAccessToken({ grant_type, useAuth = false, headers = {} }) {
   const AUTHORIZATIONS = {
     client_id: "Basic Y3Jfd2ViOg==",
@@ -50,6 +56,7 @@ function fetchAccessToken({ grant_type, useAuth = false, headers = {} }) {
     useAuth
   );
   if (!resp.isOk) {
+    checkCaptcha(resp, `${BASE}/`);
     if (resp.code === 403)
       throw new ScriptException(
         "Crunchyroll recusou o token (403). Faça login no plugin pelo Grayjay e tente novamente."
@@ -85,6 +92,7 @@ function apiGet(url, token) {
     state.access_token = null;
     resp = http.GET(url, { Authorization: `Bearer ${anonToken()}` }, useAuth);
   }
+  checkCaptcha(resp, url);
   if (!resp.isOk) throw new ScriptException(`Request failed (${resp.code}): ${url}`);
   return JSON.parse(resp.body);
 }
