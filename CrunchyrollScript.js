@@ -232,6 +232,25 @@ function crunchySearch(access_token, query, type, offset, n) {
   return (data || []).find((d) => d.type === type) || { items: [], count: 0 };
 }
 
+// Expands "default language" options (Crunchyroll locale setting) into language codes
+function resolveFilters(filters) {
+  filters = filters || {};
+  const def = getLocale();
+  const opt = filters.defaultLang || [];
+  const add = (list, on) => (on && list.indexOf(def) === -1 ? list.concat([def]) : list);
+  const mode = (filters.mode || [])[0] || "media";
+  return {
+    audio: add(filters.audio || [], opt.indexOf("audio") !== -1),
+    subtitle: add(filters.subtitle || [], opt.indexOf("subtitle") !== -1),
+    mode,
+  };
+}
+
+function boolSetting(name) {
+  const v = settings && settings[name];
+  return v === true || v === "true";
+}
+
 function matchesLanguageFilters(item, filters) {
   const has = (list, wanted) =>
     !wanted || !wanted.length || wanted.some((w) => (list || []).indexOf(w) !== -1);
@@ -250,11 +269,16 @@ class SearchPager extends VideoPager {
   }
   static search(access_token, query, filters, offset) {
     const { items, count } = crunchySearch(access_token, query, "episode", offset, 50);
-    const filtered = items.filter((i) => matchesLanguageFilters(i, filters));
-    const ids = [...new Set(filtered.map((e) => e.episode_metadata.series_id))];
-    const series = ids.length
-      ? Object.fromEntries(fetchObjects(access_token, ids).map((s) => [s.id, s]))
+    const allIds = [...new Set(items.map((e) => e.episode_metadata.series_id))];
+    const series = allIds.length
+      ? Object.fromEntries(fetchObjects(access_token, allIds).map((s) => [s.id, s]))
       : {};
+    // "media": languages of the episode itself; "creator": languages of the whole series
+    const filtered = items.filter((e) =>
+      filters.mode === "creator"
+        ? matchesLanguageFilters(series[e.episode_metadata.series_id] || {}, filters)
+        : matchesLanguageFilters(e, filters)
+    );
     const results = filtered.map(
       (e) => new PlatformVideo(crunchyrollEpisodeToPlatformVideoDef(e, series[e.episode_metadata.series_id]))
     );
@@ -272,7 +296,12 @@ class SeriesSearchPager extends ChannelPager {
   }
   static search(access_token, query, offset) {
     const { items, count } = crunchySearch(access_token, query, "series", offset, 50);
-    const results = items.map(
+    const def = getLocale();
+    const filters = {
+      audio: boolSetting("channelSearchDefaultAudio") ? [def] : [],
+      subtitle: boolSetting("channelSearchDefaultSubtitle") ? [def] : [],
+    };
+    const results = items.filter((s) => matchesLanguageFilters(s, filters)).map(
       (s) =>
         new PlatformAuthorLink(
           new PlatformID(PLATFORM, s.id, PLUGIN_ID),
@@ -314,11 +343,31 @@ Object.assign(source, {
   },
 
   getSearchCapabilities() {
+    const def = getLocale();
+    const defName = (LANGUAGES.find(([c]) => c === def) || [def, def])[1];
     const opts = (p) => LANGUAGES.map(([code, name]) => new FilterCapability(name, code, `${p}-${code}`));
     return new ResultCapabilities(
       [Type.Feed.Mixed],
       [Type.Order.Chronological],
       [
+        new FilterGroup(
+          "Idioma padrão",
+          [
+            new FilterCapability(`Áudio em ${defName}`, "audio", "default-audio"),
+            new FilterCapability(`Legenda em ${defName}`, "subtitle", "default-subtitle"),
+          ],
+          true,
+          "defaultLang"
+        ),
+        new FilterGroup(
+          "Buscar por",
+          [
+            new FilterCapability("Mídia (episódio)", "media", "mode-media"),
+            new FilterCapability("Criador (série)", "creator", "mode-creator"),
+          ],
+          false,
+          "mode"
+        ),
         new FilterGroup("Áudio (dublagem)", opts("audio"), true, "audio"),
         new FilterGroup("Legenda", opts("subtitle"), true, "subtitle"),
       ]
@@ -326,7 +375,7 @@ Object.assign(source, {
   },
 
   search(query, type, order, filters) {
-    return SearchPager.search(getToken(), query, filters || {}, 0);
+    return SearchPager.search(getToken(), query, resolveFilters(filters), 0);
   },
 
   searchChannels(query) {

@@ -6,7 +6,7 @@
 	"sourceUrl": "https://raw.githubusercontent.com/mzramna/GrayjayCrunchyroll/main/CrunchyrollConfig.json",
 	"repositoryUrl": "https://github.com/mzramna/GrayjayCrunchyroll",
 	"scriptUrl": "./CrunchyrollScript.js",
-	"version": 12,
+	"version": 13,
 	"iconUrl": "./crunchyroll.png",
 	"id": "3af73d7b-05bc-4a1b-a142-8a8377fc9c5b",
 	"scriptSignature": "",
@@ -38,6 +38,9 @@
 		],
 		"12": [
 			"Token buscado sob demanda: falha no token não desativa mais o plugin nem bloqueia o login"
+		],
+		"13": [
+			"Filtros 'Idioma padrão' (áudio/legenda) e 'Buscar por' mídia ou criador"
 		]
 	},
 	"settings": [
@@ -90,6 +93,20 @@
 				"ko-KR",
 				"pt-PT"
 			]
+		},
+		{
+			"variable": "channelSearchDefaultAudio",
+			"name": "Busca de criadores: só áudio no idioma padrão",
+			"description": "Na busca de canais (séries), mostrar apenas séries com áudio no idioma padrão",
+			"type": "Boolean",
+			"default": "false"
+		},
+		{
+			"variable": "channelSearchDefaultSubtitle",
+			"name": "Busca de criadores: só legenda no idioma padrão",
+			"description": "Na busca de canais (séries), mostrar apenas séries com legenda no idioma padrão",
+			"type": "Boolean",
+			"default": "false"
 		}
 	]
 }
