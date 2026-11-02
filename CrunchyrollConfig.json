@@ -6,7 +6,7 @@
 	"sourceUrl": "https://raw.githubusercontent.com/mzramna/GrayjayCrunchyroll/main/CrunchyrollConfig.json",
 	"repositoryUrl": "https://github.com/mzramna/GrayjayCrunchyroll",
 	"scriptUrl": "./CrunchyrollScript.js",
-	"version": 11,
+	"version": 12,
 	"iconUrl": "./crunchyroll.png",
 	"id": "3af73d7b-05bc-4a1b-a142-8a8377fc9c5b",
 	"scriptSignature": "",
@@ -35,6 +35,9 @@
 			"Busca com filtros de áudio e legenda (pt-BR incluído)",
 			"Idiomas configuráveis",
 			"Compatibilidade de JS com o Desktop"
+		],
+		"12": [
+			"Token buscado sob demanda: falha no token não desativa mais o plugin nem bloqueia o login"
 		]
 	},
 	"settings": [
