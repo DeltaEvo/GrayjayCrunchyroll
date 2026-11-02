@@ -976,6 +976,50 @@ function getUserPlaylists() {
 }
 //#endregion
 //#region utilities
+// ---- Language filters (fork) ----
+// Grayjay may hand back either the FilterCapability value or its label: accept both.
+function filterValues(filters, groupId) {
+    const raw = filters?.[groupId] ?? [];
+    const group = getLanguageFilterGroups().find((g) => g.id === groupId);
+    return raw.map((v) => {
+        const cap = group?.filters?.find((f) => f.value === v || f.name === v || f.id === v);
+        return cap ? cap.value : v;
+    });
+}
+
+function resolveLanguageFilters(filters) {
+    const defaults = filterValues(filters, "defaultLang");
+    const audio = filterValues(filters, "audio");
+    const subtitle = filterValues(filters, "subtitle");
+    if (defaults.indexOf("audio") !== -1) audio.push(getPreferredAudioLanguage());
+    if (defaults.indexOf("subtitle") !== -1) subtitle.push(getPreferredSubtitleLanguage());
+    const mode = filterValues(filters, "mode")[0] ?? "media";
+    return { audio, subtitle, mode, active: audio.length > 0 || subtitle.length > 0 };
+}
+
+// Item matches if it has ANY selected audio and ANY selected subtitle language
+function matchesLanguages(meta, langFilters) {
+    if (!meta) return false;
+    const audioList = meta.audio_locales ?? (meta.audio_locale ? [meta.audio_locale] : []);
+    const subtitleList = meta.subtitle_locales ?? [];
+    const has = (list, wanted) => wanted.length === 0 || wanted.some((w) => list.indexOf(w) !== -1);
+    return has(audioList, langFilters.audio) && has(subtitleList, langFilters.subtitle);
+}
+
+function fetchSeriesMetadata(ids) {
+    const unique = [...new Set(ids.filter(Boolean))];
+    if (!unique.length) return {};
+    const url = replaceUrlPlaceholders(OBJECT_WITH_RATINGS_URL_TEMPLATE, {
+        objectId: unique.join(","),
+        queryString: objectToUrlEncodedString(getLocalizationSettings()),
+    });
+    const response = http_client.GET(url, getHeaders(), true);
+    if (!response.isOk) return {};
+    const result = {};
+    (JSON.parse(response.body)?.data ?? []).forEach((serie) => { result[serie.id] = serie; });
+    return result;
+}
+
 function genericSearch(query, type, order, filters) {
 
     class GenericSearchPager extends VideoPager {
@@ -1007,12 +1051,26 @@ function genericSearch(query, type, order, filters) {
             const response = http_client.GET(replaceUrlPlaceholders(SEARCH_TEMPLATE_URL, { queryString }), getHeaders(), true);
 
             const contentList = [];
+            let rawCount = 0;
+            const langFilters = resolveLanguageFilters(filters);
             if (response.isOk) {
                 const searchResults = JSON.parse(response.body)?.data ?? [];
                 searchResults.forEach((searchResult) => {
+                    rawCount += searchResult?.items?.length ?? 0;
                     // handle other types in the future
                     if (searchResult.type === "episode") {
+                        const seriesById = langFilters.active && langFilters.mode === "creator"
+                            ? fetchSeriesMetadata(searchResult.items.map((i) => i?.episode_metadata?.series_id))
+                            : {};
                         searchResult.items
+                            .filter((metadata) => {
+                                if (!langFilters.active) return true;
+                                if (langFilters.mode === "creator") {
+                                    const serie = seriesById[metadata?.episode_metadata?.series_id];
+                                    return serie ? matchesLanguages(serie.series_metadata, langFilters) : false;
+                                }
+                                return matchesLanguages(metadata.episode_metadata, langFilters);
+                            })
                             .forEach((metadata) => {
                                 const content = episodeToPlatformVideo(metadata);
                                 if (content) {
@@ -1023,6 +1081,7 @@ function genericSearch(query, type, order, filters) {
 
                     if (searchResult.type === "series") {
                         searchResult.items
+                            .filter((metadata) => !langFilters.active || matchesLanguages(metadata.series_metadata, langFilters))
                             .forEach((metadata) => {
                                 contentList.push(serieToPlatformChannel(metadata));
                             });
@@ -1032,7 +1091,7 @@ function genericSearch(query, type, order, filters) {
 
             return new GenericSearchPager({
                 videos: contentList,
-                hasMore: contentList.length > 0,
+                hasMore: rawCount > 0,
                 context: { start: start + ITEMS_PER_PAGE },
             });
         }
