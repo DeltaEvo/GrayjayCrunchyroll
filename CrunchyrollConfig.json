@@ -3,31 +3,94 @@
 	"description": "Crunchyroll plugin",
 	"author": "DeltaEvo",
 	"authorUrl": "https://github.com/DeltaEvo",
-
-	"sourceUrl": "https://DeltaEvo.github.io/GrayjayCrunchyroll/CrunchyrollConfig.json",
-	"repositoryUrl": "https://github.com/DeltaEvo/GrayjayCrunchyroll",
+	"sourceUrl": "https://mzramna.github.io/GrayjayCrunchyroll/CrunchyrollConfig.json",
+	"repositoryUrl": "https://github.com/mzramna/GrayjayCrunchyroll",
 	"scriptUrl": "./CrunchyrollScript.js",
-	"version": 3,
-
+	"version": 4,
 	"iconUrl": "./crunchyroll.png",
 	"id": "3af73d7b-05bc-4a1b-a142-8a8377fc9c5b",
-
 	"scriptSignature": "",
 	"scriptPublicKey": "",
-	"packages": ["Http"],
-
+	"packages": [
+		"Http"
+	],
 	"allowEval": false,
 	"allowUrls": [
-		"www.crunchyroll.com",
-		"static.crunchyroll.com",
-		"cr-play-service.prd.crunchyrollsvc.com",
-		"v.vrv.co"
+		"everywhere"
 	],
-
 	"authentication": {
-		"userAgent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.5481.153 Mobile Safari/537.36",
-		"loginUrl": "https://sso.crunchyroll.com/login",
-		"cookiesToFind": ["etp_rt"],
-		"cookiesExclOthers": true
-	}
+		"loginUrl": "https://www.crunchyroll.com/login",
+		"completionUrl": "https://www.crunchyroll.com/",
+		"cookiesToFind": [
+			"etp_rt"
+		],
+		"cookiesExclOthers": false
+	},
+	"platformUrl": "https://www.crunchyroll.com",
+	"changelog": {
+		"4": [
+			"Compatibilidade com Grayjay Desktop",
+			"Busca com filtros de idioma de áudio (dublagem) e legenda",
+			"Configurações de idioma (pt-BR incluído)"
+		]
+	},
+	"settings": [
+		{
+			"variable": "locale",
+			"name": "Idioma dos metadados",
+			"description": "Idioma dos títulos e descrições",
+			"type": "Dropdown",
+			"default": "0",
+			"options": [
+				"pt-BR",
+				"ja-JP",
+				"en-US",
+				"es-419",
+				"es-ES",
+				"fr-FR",
+				"de-DE",
+				"it-IT",
+				"ru-RU",
+				"ar-SA",
+				"hi-IN",
+				"ta-IN",
+				"te-IN",
+				"zh-CN",
+				"ko-KR",
+				"pt-PT"
+			]
+		},
+		{
+			"variable": "audioLanguage",
+			"name": "Idioma de áudio preferido",
+			"description": "Usado na home e nas temporadas",
+			"type": "Dropdown",
+			"default": "1",
+			"options": [
+				"pt-BR",
+				"ja-JP",
+				"en-US",
+				"es-419",
+				"es-ES",
+				"fr-FR",
+				"de-DE",
+				"it-IT",
+				"ru-RU",
+				"ar-SA",
+				"hi-IN",
+				"ta-IN",
+				"te-IN",
+				"zh-CN",
+				"ko-KR",
+				"pt-PT"
+			]
+		},
+		{
+			"variable": "onlyPreferredAudio",
+			"name": "Home: só áudio preferido",
+			"description": "Mostrar na home apenas episódios no idioma de áudio preferido",
+			"type": "Boolean",
+			"default": "false"
+		}
+	]
 }
