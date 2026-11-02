@@ -40,13 +40,47 @@ function fetchAccessToken({ grant_type, useAuth = false, headers = {} }) {
     useAuth
   );
 
-  if (!resp.isOk)
-    throw new ScriptException(
-      `Crunchyroll recusou o token (${resp.code}). Faça login no plugin e tente novamente.`
-    );
-  const { access_token } = JSON.parse(resp.body);
+  if (!resp.isOk) {
+    if (useAuth)
+      throw new ScriptLoginRequiredException(
+        `Crunchyroll recusou o login (${resp.code}). Faça login novamente e selecione o perfil.`
+      );
+    throw new ScriptException(`Crunchyroll recusou o token (${resp.code}).`);
+  }
+  const token = JSON.parse(resp.body);
 
-  return access_token;
+  if (useAuth && !token.profile_id && token.refresh_token) {
+    try {
+      return selectProfile(token);
+    } catch (e) {
+      log("Crunchyroll: falha ao selecionar perfil: " + e);
+    }
+  }
+
+  return token.access_token;
+}
+
+// Accounts with multiple profiles need a profile-bound token to play videos
+function selectProfile(token) {
+  const resp = http.GET("https://www.crunchyroll.com/accounts/v1/me/multiprofile", {
+    Authorization: `Bearer ${token.access_token}`,
+  });
+  if (!resp.isOk) return token.access_token;
+  const profiles = JSON.parse(resp.body).profiles || [];
+  if (!profiles.length) return token.access_token;
+  const idx = parseInt(settings && settings.profileIndex, 10) || 0;
+  const profile = profiles[idx] || profiles.find((p) => p.is_primary) || profiles[0];
+  const r = http.POST(
+    "https://www.crunchyroll.com/auth/v1/token",
+    `grant_type=refresh_token_profile_id&profile_id=${profile.profile_id}&refresh_token=${encodeURIComponent(token.refresh_token)}`,
+    {
+      Authorization: "Basic bm9haWhkZXZtXzZpeWcwYThsMHE6",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    false
+  );
+  if (!r.isOk) return token.access_token;
+  return JSON.parse(r.body).access_token || token.access_token;
 }
 
 let cachedToken = null;
@@ -74,7 +108,18 @@ function fetchObjects(access_token, ids) {
     }
   );
 
-  return JSON.parse(resp.body).data;
+  let body = null;
+  try {
+    body = JSON.parse(resp.body);
+  } catch (e) {}
+  if (!resp.isOk || !body || !Array.isArray(body.data)) {
+    if (resp.code === 401 || resp.code === 403)
+      throw new ScriptLoginRequiredException(
+        `Crunchyroll recusou o acesso (${resp.code}). Faça login, selecione o perfil e tente novamente.`
+      );
+    throw new ScriptException(`Crunchyroll: resposta inesperada (${resp.code}) ao buscar ${ids.join(",")}`);
+  }
+  return body.data;
 }
 
 function queryString(o) {
