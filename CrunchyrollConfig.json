@@ -4,7 +4,7 @@
   "author": "mzramna (fork do plugin da FUTO)",
   "authorUrl": "https://github.com/mzramna",
   "platformUrl": "https://crunchyroll.com",
-  "sourceUrl": "https://raw.githubusercontent.com/mzramna/GrayjayCrunchyroll/ccr-6717db76-8r4b9h/CrunchyrollConfig.json",
+  "sourceUrl": "https://raw.githubusercontent.com/mzramna/GrayjayCrunchyroll/main/CrunchyrollConfig.json",
   "scriptUrl": "./CrunchyrollScript.js",
   "repositoryUrl": "https://github.com/mzramna/GrayjayCrunchyroll",
   "version": 23,
