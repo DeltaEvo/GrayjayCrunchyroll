@@ -327,7 +327,36 @@ function getHome() {
 function getSearchCapabilities() {
     return new ResultCapabilities([
         Type.Feed.Videos
-    ], [], []);
+    ], [], getLanguageFilterGroups());
+}
+
+// Search filters (fork): default-language shortcuts, search mode and per-language lists.
+// Step 1: only exposes the filters; search results are not filtered yet.
+function getLanguageFilterGroups() {
+    const audioLang = getPreferredAudioLanguage();
+    const subtitleLang = getPreferredSubtitleLanguage();
+    const audioName = PREFERED_AUDIO_LANGUAGE_OPTIONS_VALUES?.[audioLang]?.langName ?? audioLang;
+    const subtitleName = loadOptionsForSetting("subtitlesLanguageOptionIndex")
+        .find((o) => o.startsWith(subtitleLang + " - "))?.split(" - ")[1] ?? subtitleLang;
+
+    const languageOptions = (prefix) => loadOptionsForSetting("preferredAudioLanguageOptionIndex")
+        .map((option) => {
+            const [langCode, langName] = option.split(" - ");
+            return new FilterCapability(`${langName} (${langCode})`, langCode, `${prefix}-${langCode}`);
+        });
+
+    return [
+        new FilterGroup("Idioma padrão", [
+            new FilterCapability(`Áudio em ${audioName}`, "audio", "default-audio"),
+            new FilterCapability(`Legenda em ${subtitleName}`, "subtitle", "default-subtitle"),
+        ], true, "defaultLang"),
+        new FilterGroup("Buscar por", [
+            new FilterCapability("Mídia (episódio)", "media", "mode-media"),
+            new FilterCapability("Criador (série)", "creator", "mode-creator"),
+        ], false, "mode"),
+        new FilterGroup("Áudio (dublagem)", languageOptions("audio"), true, "audio"),
+        new FilterGroup("Legenda", languageOptions("subtitle"), true, "subtitle"),
+    ];
 }
 
 function search(query, type, order, filters) {
