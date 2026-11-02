@@ -339,20 +339,21 @@ function getLanguageFilterGroups() {
     const subtitleName = loadOptionsForSetting("subtitlesLanguageOptionIndex")
         .find((o) => o.startsWith(subtitleLang + " - "))?.split(" - ")[1] ?? subtitleLang;
 
+    // Grayjay shows the 3rd FilterCapability argument as the label, so it repeats the name
     const languageOptions = (prefix) => loadOptionsForSetting("preferredAudioLanguageOptionIndex")
         .map((option) => {
             const [langCode, langName] = option.split(" - ");
-            return new FilterCapability(`${langName} (${langCode})`, langCode, `${prefix}-${langCode}`);
+            return new FilterCapability(`${langName} (${langCode})`, langCode, `${langName} (${langCode})`);
         });
 
     return [
         new FilterGroup("Idioma padrão", [
-            new FilterCapability(`Áudio em ${audioName}`, "audio", "default-audio"),
-            new FilterCapability(`Legenda em ${subtitleName}`, "subtitle", "default-subtitle"),
+            new FilterCapability(`Áudio em ${audioName}`, "audio", `Áudio em ${audioName}`),
+            new FilterCapability(`Legenda em ${subtitleName}`, "subtitle", `Legenda em ${subtitleName}`),
         ], true, "defaultLang"),
         new FilterGroup("Buscar por", [
-            new FilterCapability("Mídia (episódio)", "media", "mode-media"),
-            new FilterCapability("Criador (série)", "creator", "mode-creator"),
+            new FilterCapability("Mídia (episódio)", "media", "Mídia (episódio)"),
+            new FilterCapability("Criador (série)", "creator", "Criador (série)"),
         ], false, "mode"),
         new FilterGroup("Áudio (dublagem)", languageOptions("audio"), true, "audio"),
         new FilterGroup("Legenda", languageOptions("subtitle"), true, "subtitle"),

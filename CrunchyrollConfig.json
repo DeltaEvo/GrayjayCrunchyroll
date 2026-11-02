@@ -7,7 +7,7 @@
   "sourceUrl": "https://raw.githubusercontent.com/mzramna/GrayjayCrunchyroll/ccr-6717db76-8r4b9h/CrunchyrollConfig.json",
   "scriptUrl": "./CrunchyrollScript.js",
   "repositoryUrl": "https://github.com/mzramna/GrayjayCrunchyroll",
-  "version": 21,
+  "version": 22,
   "iconUrl": "./CrunchyrollIcon.png",
   "id": "d9d7bb6c-fd47-4141-b411-54290e54aa15",
   "scriptSignature": "",
@@ -195,6 +195,9 @@
     ],
     "21": [
       "Busca: filtros de idioma padrão, modo (mídia/criador), áudio e legenda (apenas interface, sem filtrar ainda)"
+    ],
+    "22": [
+      "Corrige rótulos dos filtros (mostravam o id)"
     ]
   }
 }
