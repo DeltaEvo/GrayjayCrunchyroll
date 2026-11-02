@@ -49,13 +49,27 @@ function fetchAccessToken({ grant_type, useAuth = false, headers = {} }) {
     ),
     useAuth
   );
-  if (!resp.isOk) throw new ScriptException(`Token request failed (${resp.code})`);
+  if (!resp.isOk) {
+    if (resp.code === 403)
+      throw new ScriptException(
+        "Crunchyroll recusou o token (403). Faça login no plugin pelo Grayjay e tente novamente."
+      );
+    throw new ScriptException(`Token request failed (${resp.code})`);
+  }
   return JSON.parse(resp.body);
 }
 
 function anonToken() {
   if (!state.access_token || Date.now() >= state.expires_at) {
-    const { access_token, expires_in } = fetchAccessToken({ grant_type: "client_id" });
+    const loggedIn = bridge.isLoggedIn();
+    // When logged in, use the user's session (and the cookies captured at login)
+    const { access_token, expires_in } = loggedIn
+      ? fetchAccessToken({
+          grant_type: "etp_rt_cookie",
+          headers: { "ETP-Anonymous-ID": "89142ecb-e25d-4799-b96e-b23c09a71a6b" },
+          useAuth: true,
+        })
+      : fetchAccessToken({ grant_type: "client_id" });
     state = {
       access_token,
       expires_at: Date.now() + Math.max((expires_in || 300) - 30, 30) * 1000,
@@ -65,10 +79,11 @@ function anonToken() {
 }
 
 function apiGet(url, token) {
-  let resp = http.GET(url, { Authorization: `Bearer ${token || anonToken()}` });
+  const useAuth = !token && bridge.isLoggedIn();
+  let resp = http.GET(url, { Authorization: `Bearer ${token || anonToken()}` }, useAuth);
   if (resp.code === 401 && !token) {
     state.access_token = null;
-    resp = http.GET(url, { Authorization: `Bearer ${anonToken()}` });
+    resp = http.GET(url, { Authorization: `Bearer ${anonToken()}` }, useAuth);
   }
   if (!resp.isOk) throw new ScriptException(`Request failed (${resp.code}): ${url}`);
   return JSON.parse(resp.body);
@@ -305,7 +320,15 @@ Object.assign(source, {
         state = JSON.parse(savedState);
       } catch (e) {}
     }
-    anonToken();
+    // No network call here: a failure would abort the plugin installation.
+  },
+
+  onLoggedIn() {
+    state = { access_token: null, expires_at: 0 };
+  },
+
+  onLoggedOut() {
+    state = { access_token: null, expires_at: 0 };
   },
 
   saveState() {
