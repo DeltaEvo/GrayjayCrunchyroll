@@ -1,17 +1,17 @@
 {
-  "name": "Crunchyroll",
+  "name": "Crunchyroll (mzramna)",
   "description": "Watch the latest anime on Crunchyroll",
-  "author": "FUTO",
-  "authorUrl": "https://futo.tech",
+  "author": "mzramna (fork do plugin da FUTO)",
+  "authorUrl": "https://github.com/mzramna",
   "platformUrl": "https://crunchyroll.com",
-  "sourceUrl": "https://plugins.grayjay.app/Crunchyroll/CrunchyrollConfig.json",
+  "sourceUrl": "https://raw.githubusercontent.com/mzramna/GrayjayCrunchyroll/main/CrunchyrollConfig.json",
   "scriptUrl": "./CrunchyrollScript.js",
-  "repositoryUrl": "https://gitlab.futo.org/videostreaming/plugins/crunchyroll",
-  "version": 19,
+  "repositoryUrl": "https://github.com/mzramna/GrayjayCrunchyroll",
+  "version": 20,
   "iconUrl": "./CrunchyrollIcon.png",
-  "id": "9bb33039-8580-48d4-9849-21319ae845a4",
-  "scriptSignature": "p26bLErmR04unQbiT8AeK5pp1XYL/hhsawHhh/tQ0jROol4bywliyKf8sYPI7MrpDS/5tSm/ZEfkRgVIBsO6xLZI6/OLNqmCgXEDG9SHD09TKtS3yos9/PkL9+FaDo0bnKGHPUp6c94sLqIr0MHp7qbewVSif9cR3bjcivzlUKKWt2aIhhGx+zNs44shlgRiZ6vIcbdJO+ptBiNwmF5Sse8rbprCaXskCw1UFmdyxsJjqa05+V5QFfznpR+IRqbJRW3nDJiv/+qAAEz0RL+Vghy9TSkxnjfQ7Km1m2ZcAgzl4mTEkD+fUwjRkwXioyiosKg3p5hPvBakkPEqKzmSSA==",
-  "scriptPublicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsoFJU4AReDyUnSQI9A99UjLCwkY8OH+1o8cdtf2EjSb+fO2qmP8MGMTAvfvgmq5d2QBJE2XHRkRO3JKcTlcc1j0WlOlU8P9W272DYCeX6oYaavpKNqGKoGEuodp9wtiyNwyH46++JfpU/uIUacZbZKkHv9gIGchmNvpKYZQjFd/8pUqXGpcXZP54tGSC9PLcY+5TozZThK7Oy1+3YEf1bZ44UinRYYATbLk/wNuAfsupvlt6nxZOcJhABhdo9V+gY0FE6Ayg5+1cd1noWhnRtLF+sPdEr3z8Nt15JEK5a/524t25FMhwz8yKxlGW5qW3QLJHSUgLQncL6a1zlZ1s8QIDAQAB",
+  "id": "d9d7bb6c-fd47-4141-b411-54290e54aa15",
+  "scriptSignature": "",
+  "scriptPublicKey": "",
   "packages": [
     "Http",
     "Utilities"
@@ -189,6 +189,9 @@
       "Fix: Error when opening an episode that has not aired yet;",
       "Improvement: Show upcoming episodes as planned on desktop;",
       "Improvement: Show unavailable episodes as locked or hide them, following the premium content setting;"
+    ],
+    "20": [
+      "Fork: remove assinatura da FUTO, novo id e sourceUrl"
     ]
   }
 }
