@@ -7,7 +7,7 @@
   "sourceUrl": "https://raw.githubusercontent.com/mzramna/GrayjayCrunchyroll/main/CrunchyrollConfig.json",
   "scriptUrl": "./CrunchyrollScript.js",
   "repositoryUrl": "https://github.com/mzramna/GrayjayCrunchyroll",
-  "version": 20,
+  "version": 23,
   "iconUrl": "./CrunchyrollIcon.png",
   "id": "d9d7bb6c-fd47-4141-b411-54290e54aa15",
   "scriptSignature": "",
@@ -192,6 +192,15 @@
     ],
     "20": [
       "Fork: remove assinatura da FUTO, novo id e sourceUrl"
+    ],
+    "21": [
+      "Busca: filtros de idioma padrão, modo (mídia/criador), áudio e legenda (apenas interface, sem filtrar ainda)"
+    ],
+    "22": [
+      "Corrige rótulos dos filtros (mostravam o id)"
+    ],
+    "23": [
+      "Busca: filtra por áudio/legenda (idioma padrão ou lista), por mídia ou criador; também na busca de criadores"
     ]
   }
 }
