@@ -6,7 +6,7 @@
 	"sourceUrl": "https://raw.githubusercontent.com/mzramna/GrayjayCrunchyroll/main/CrunchyrollConfig.json",
 	"repositoryUrl": "https://github.com/mzramna/GrayjayCrunchyroll",
 	"scriptUrl": "./CrunchyrollScript.js",
-	"version": 9,
+	"version": 10,
 	"iconUrl": "./crunchyroll.png",
 	"id": "3af73d7b-05bc-4a1b-a142-8a8377fc9c5b",
 	"scriptSignature": "",
@@ -48,6 +48,9 @@
 		],
 		"9": [
 			"Login: volta à configuração original (SSO + cookie etp_rt); remove captcha"
+		],
+		"10": [
+			"Janela de verificação da Cloudflare com o mesmo User-Agent das requisições"
 		]
 	},
 	"settings": [
@@ -108,5 +111,12 @@
 			"type": "Boolean",
 			"default": "false"
 		}
-	]
+	],
+	"captcha": {
+		"userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+		"captchaUrl": "https://www.crunchyroll.com/",
+		"cookiesToFind": [
+			"cf_clearance"
+		]
+	}
 }

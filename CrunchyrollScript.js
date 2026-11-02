@@ -1,6 +1,8 @@
 const PLATFORM = "Crunchyroll";
 const PLUGIN_ID = "3af73d7b-05bc-4a1b-a142-8a8377fc9c5b";
 const BASE = "https://www.crunchyroll.com";
+// Must match authentication/captcha userAgent in CrunchyrollConfig.json (cf_clearance is bound to it)
+const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
 
 // Must match the "options" order in CrunchyrollConfig.json settings
 const LANGUAGES = [
@@ -50,6 +52,7 @@ function fetchAccessToken({ grant_type, useAuth = false, headers = {} }) {
       {
         Authorization: AUTHORIZATIONS[grant_type],
         "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": UA,
       },
       headers
     ),
@@ -87,10 +90,10 @@ function anonToken() {
 
 function apiGet(url, token) {
   const useAuth = !token && bridge.isLoggedIn();
-  let resp = http.GET(url, { Authorization: `Bearer ${token || anonToken()}` }, useAuth);
+  let resp = http.GET(url, { Authorization: `Bearer ${token || anonToken()}`, "User-Agent": UA }, useAuth);
   if (resp.code === 401 && !token) {
     state.access_token = null;
-    resp = http.GET(url, { Authorization: `Bearer ${anonToken()}` }, useAuth);
+    resp = http.GET(url, { Authorization: `Bearer ${anonToken()}`, "User-Agent": UA }, useAuth);
   }
   checkCaptcha(resp, url);
   if (!resp.isOk) throw new ScriptException(`Request failed (${resp.code}): ${url}`);
