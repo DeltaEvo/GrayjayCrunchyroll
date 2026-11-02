@@ -6,7 +6,7 @@
 	"sourceUrl": "https://raw.githubusercontent.com/mzramna/GrayjayCrunchyroll/main/CrunchyrollConfig.json",
 	"repositoryUrl": "https://github.com/mzramna/GrayjayCrunchyroll",
 	"scriptUrl": "./CrunchyrollScript.js",
-	"version": 10,
+	"version": 11,
 	"iconUrl": "./crunchyroll.png",
 	"id": "3af73d7b-05bc-4a1b-a142-8a8377fc9c5b",
 	"scriptSignature": "",
@@ -16,41 +16,25 @@
 	],
 	"allowEval": false,
 	"allowUrls": [
-		"everywhere"
+		"www.crunchyroll.com",
+		"static.crunchyroll.com",
+		"cr-play-service.prd.crunchyrollsvc.com",
+		"v.vrv.co"
 	],
 	"authentication": {
-		"userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+		"userAgent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.5481.153 Mobile Safari/537.36",
 		"loginUrl": "https://sso.crunchyroll.com/login",
 		"cookiesToFind": [
 			"etp_rt"
 		],
-		"cookiesExclOthers": false
+		"cookiesExclOthers": true
 	},
-	"platformUrl": "https://www.crunchyroll.com",
 	"changelog": {
-		"4": [
-			"Compatibilidade com Grayjay Desktop",
-			"Busca com filtros de idioma de áudio (dublagem) e legenda",
-			"Configurações de idioma (pt-BR incluído)"
-		],
-		"5": [
-			"Corrige falha na instalação (403 no token)",
-			"Usa a sessão logada para obter o token"
-		],
-		"6": [
-			"Corrige detecção de login no Desktop"
-		],
-		"7": [
-			"Quando a Cloudflare bloquear, abre a verificação para o usuário resolver"
-		],
-		"8": [
-			"Corrige janela de login que não abria"
-		],
-		"9": [
-			"Login: volta à configuração original (SSO + cookie etp_rt); remove captcha"
-		],
-		"10": [
-			"Janela de verificação da Cloudflare com o mesmo User-Agent das requisições"
+		"11": [
+			"Recomeça do plugin original (login original)",
+			"Busca com filtros de áudio e legenda (pt-BR incluído)",
+			"Idiomas configuráveis",
+			"Compatibilidade de JS com o Desktop"
 		]
 	},
 	"settings": [
@@ -103,20 +87,6 @@
 				"ko-KR",
 				"pt-PT"
 			]
-		},
-		{
-			"variable": "onlyPreferredAudio",
-			"name": "Home: só áudio preferido",
-			"description": "Mostrar na home apenas episódios no idioma de áudio preferido",
-			"type": "Boolean",
-			"default": "false"
 		}
-	],
-	"captcha": {
-		"userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
-		"captchaUrl": "https://www.crunchyroll.com/",
-		"cookiesToFind": [
-			"cf_clearance"
-		]
-	}
+	]
 }
