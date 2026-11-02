@@ -1,5 +1,5 @@
 {
-  "name": "Crunchyroll (mzramna)",
+  "name": "Crunchyroll",
   "description": "Watch the latest anime on Crunchyroll",
   "author": "mzramna (fork do plugin da FUTO)",
   "authorUrl": "https://github.com/mzramna",
@@ -7,7 +7,7 @@
   "sourceUrl": "https://raw.githubusercontent.com/mzramna/GrayjayCrunchyroll/main/CrunchyrollConfig.json",
   "scriptUrl": "./CrunchyrollScript.js",
   "repositoryUrl": "https://github.com/mzramna/GrayjayCrunchyroll",
-  "version": 23,
+  "version": 24,
   "iconUrl": "./CrunchyrollIcon.png",
   "id": "d9d7bb6c-fd47-4141-b411-54290e54aa15",
   "scriptSignature": "",
@@ -201,6 +201,9 @@
     ],
     "23": [
       "Busca: filtra por áudio/legenda (idioma padrão ou lista), por mídia ou criador; também na busca de criadores"
+    ],
+    "24": [
+      "Renomeia o plugin para Crunchyroll"
     ]
   }
 }

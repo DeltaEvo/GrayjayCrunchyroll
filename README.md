@@ -1,4 +1,4 @@
-# Crunchyroll (fork mzramna)
+# Crunchyroll
 
 Fork do plugin oficial da FUTO para o Grayjay (Android e Desktop com Widevine).
 
